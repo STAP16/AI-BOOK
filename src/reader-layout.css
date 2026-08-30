@@ -37,9 +37,10 @@ body.dark *::-webkit-scrollbar-thumb:hover { background: #63c884; }
 .home-footer small { font-size: 12px; white-space: nowrap; }
 
 @media (max-width: 760px) {
-  .home-footer { min-height: 130px; grid-template-columns: 1fr; gap: 9px; padding-block: 22px; text-align: center; }
+  .home-footer { min-height: 130px; grid-template-columns: 1fr; gap: 9px; padding-block: 22px; margin-top: 28px; text-align: center; }
   .footer-brand { justify-content: center; }
   .home-footer > span { text-align: center; }
+  .home-footer small { white-space: normal; }
 }
 
 .reader-page {

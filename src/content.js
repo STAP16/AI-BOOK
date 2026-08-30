@@ -64,6 +64,11 @@ function excerptFrom(raw) {
   return text || 'Практическая глава о том, как думать, проектировать и собирать AI-системы.'
 }
 
+function withAssetBase(source) {
+  const base = import.meta.env.BASE_URL || '/'
+  return source.replaceAll('](/book-assets/', `](${base}book-assets/`)
+}
+
 export const documents = Object.entries(rawModules)
   .map(([filePath, raw]) => {
     const parts = filePath.split('/')
@@ -97,7 +102,8 @@ export const firstDocument = documents[0]
 export const lastDocument = documents.at(-1)
 
 export async function compileDocument(document) {
-  const source = /^#{1,6}\s+/.test(document.raw) ? document.raw.replace(/^#{1,6}\s+.*(?:\r?\n){1,2}/, '') : document.raw
+  const rawSource = /^#{1,6}\s+/.test(document.raw) ? document.raw.replace(/^#{1,6}\s+.*(?:\r?\n){1,2}/, '') : document.raw
+  const source = withAssetBase(rawSource)
   const evaluated = await evaluate(source, {
     ...runtime,
     remarkPlugins: [remarkGfm],
