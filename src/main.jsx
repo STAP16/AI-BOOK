@@ -62,7 +62,7 @@ function Header({ progress, onSearch, dark, setDark }) {
     <div className="top-actions">
       <button className="icon-button" onClick={() => setDark(!dark)} aria-label="Переключить тему"><Icon name={dark ? 'sun' : 'moon'} size={19} /></button>
       <span className="divider" />
-      <button className="text-button" onClick={() => navigate()}><Icon name="book" size={19} /> <span>О книге</span></button>
+      <button className="text-button about-button" onClick={() => navigate()}><Icon name="book" size={19} /> <span>О книге</span></button>
       <a className="text-button" href="https://github.com/STAP16/AI-BOOK" target="_blank" rel="noreferrer"><Icon name="github" size={20} /> <span>GitHub</span></a>
       <span className="divider" />
       <div className="progress"><span>Прогресс чтения</span><div><i style={{ width: `${progress}%` }} /></div></div><strong className="progress-number">{progress}%</strong>
