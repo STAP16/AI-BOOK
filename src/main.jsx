@@ -31,6 +31,8 @@ function navigate(id) {
   window.location.hash = id ? `read/${encodeURIComponent(id)}` : ''
 }
 
+const LAST_DOCUMENT_KEY = 'reading-document'
+
 function useRoute() {
   const getRoute = () => {
     const hash = window.location.hash.replace(/^#/, '')
@@ -98,10 +100,10 @@ function Sidebar({ current, close }) {
   </aside>
 }
 
-function Home({ onStart, progress }) {
+function Home({ onStart, hasResume, progress }) {
   return <main className="home-page">
     <section className="hero container">
-      <div className="hero-copy"><span className="eyebrow">ДОБРО ПОЖАЛОВАТЬ</span><h1>AI-инженерия:<br />от понимания к созданию<br />собственных систем</h1><p>Практическое руководство для тех, кто хочет не просто использовать AI, а понимать его устройство и создавать умные, надёжные и полезные AI-системы.</p><div className="hero-actions"><button className="primary-button" onClick={onStart}><Icon name="book" size={19} /> {progress ? 'Продолжить чтение' : 'Начать читать'}</button><button className="secondary-button" onClick={() => navigate(firstDocument.id)}><span className="play">▷</span> Открыть содержание</button></div><div className="hero-meta"><span><Icon name="clock" size={18} /> Около 12 часов чтения</span><b>•</b><span>{parts.length} частей</span><b>•</b><span>{documents.length} глав</span></div></div>
+      <div className="hero-copy"><span className="eyebrow">ДОБРО ПОЖАЛОВАТЬ</span><h1>AI-инженерия:<br />от понимания к созданию<br />собственных систем</h1><p>Практическое руководство для тех, кто хочет не просто использовать AI, а понимать его устройство и создавать умные, надёжные и полезные AI-системы.</p><div className="hero-actions"><button className="primary-button" onClick={onStart}><Icon name="book" size={19} /> {hasResume || progress ? 'Продолжить чтение' : 'Начать читать'}</button><button className="secondary-button" onClick={() => navigate(firstDocument.id)}><span className="play">▷</span> Открыть содержание</button></div><div className="hero-meta"><span><Icon name="clock" size={18} /> Около 12 часов чтения</span><b>•</b><span>{parts.length} частей</span><b>•</b><span>{documents.length} глав</span></div></div>
       <div className="hero-art" aria-label="Обложка книги"><div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="node node-a" /><div className="node node-b" /><div className="node node-c" /><div className="book-illustration"><div className="book-cover"><div className="cover-mark"><Logo /></div><strong>AI ENGINEER</strong><span>Руководство<br />по созданию AI-систем</span></div><div className="book-pages" /></div><span className="code-orbit">&lt;/&gt;</span><span className="brain-orbit">◌</span></div>
     </section>
     <footer className="home-footer container"><div className="footer-brand"><Logo /><strong>AI ENGINEER</strong></div><span>Практическое руководство по созданию AI-систем</span><small>© 2026 AI Engineer · Котоман Степан</small></footer>
@@ -138,10 +140,13 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
   const [progress, setProgress] = useState(() => Number(localStorage.getItem('reading-progress') || 0))
+  const [lastDocumentId, setLastDocumentId] = useState(() => localStorage.getItem(LAST_DOCUMENT_KEY) || '')
   useEffect(() => { document.body.classList.toggle('dark', dark); localStorage.setItem('theme', dark ? 'dark' : 'light') }, [dark])
   useEffect(() => { const onKey = (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setSearchOpen(true) } if (event.key === 'Escape') setSearchOpen(false) }; window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey) }, [])
+  useEffect(() => { if (!current) return; localStorage.setItem(LAST_DOCUMENT_KEY, current.id); setLastDocumentId(current.id) }, [current])
   useEffect(() => { if (!current) return; const onScroll = () => { const max = document.documentElement.scrollHeight - window.innerHeight; const value = Math.round((window.scrollY / Math.max(max, 1)) * 100); if (value > progress) { setProgress(value); localStorage.setItem('reading-progress', String(value)) } }; window.addEventListener('scroll', onScroll); return () => window.removeEventListener('scroll', onScroll) }, [current, progress])
-  return <><Header progress={progress} onSearch={() => setSearchOpen(true)} dark={dark} setDark={setDark} /><div className={`app-shell ${menuOpen ? 'menu-open' : ''}`}>{current ? <Reader document={current} onMenu={() => setMenuOpen(!menuOpen)} /> : <Home progress={progress} onStart={() => navigate(firstDocument.id)} />}</div>{searchOpen && <SearchModal close={() => setSearchOpen(false)} />}</>
+  const resumeDocument = findDocument(lastDocumentId)
+  return <><Header progress={progress} onSearch={() => setSearchOpen(true)} dark={dark} setDark={setDark} /><div className={`app-shell ${menuOpen ? 'menu-open' : ''}`}>{current ? <Reader document={current} onMenu={() => setMenuOpen(!menuOpen)} /> : <Home progress={progress} hasResume={Boolean(resumeDocument)} onStart={() => navigate((resumeDocument || firstDocument).id)} />}</div>{searchOpen && <SearchModal close={() => setSearchOpen(false)} />}</>
 }
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>)
