@@ -28,7 +28,7 @@ function stripMarkdown(value) {
 }
 
 function titleFrom(raw, filePath) {
-  const heading = raw.trimStart().match(/^#{1,6}\s+(.+)$/)?.[1]
+  const heading = raw.trimStart().match(/^#{1,6}\s+(.+)$/m)?.[1]
   if (heading) return stripMarkdown(heading)
   return filePath.split('/').pop().replace(/\.mdx$/, '').replace(/^Часть [IVX]+\.\s*/, '')
 }
